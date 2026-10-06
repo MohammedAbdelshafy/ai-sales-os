@@ -1,0 +1,33 @@
+name: 'AI Sales OS'
+description: 'Qualify an opportunities CSV against your ICP in CI: evidence-backed queue, next actions, exception report.'
+author: 'Mohammed Abdelshafy'
+branding:
+  icon: 'trending-up'
+  color: 'green'
+inputs:
+  opps:
+    description: 'Path to opportunities CSV, relative to your repo root'
+    required: true
+  icp:
+    description: 'Path to ICP config (YAML or JSON), relative to your repo root'
+    required: true
+  out:
+    description: 'Output directory for the qualification report'
+    required: false
+    default: './sales-os-out'
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout AI Sales OS
+      uses: actions/checkout@v4
+      with:
+        repository: MohammedAbdelshafy/ai-sales-os
+        path: _aisalesos
+    - name: Qualify opportunities
+      shell: bash
+      run: |
+        cd _aisalesos
+        python3 -m ai_sales_os qualify \
+          --opps "${{ github.workspace }}/${{ inputs.opps }}" \
+          --icp "${{ github.workspace }}/${{ inputs.icp }}" \
+          --out "${{ github.workspace }}/${{ inputs.out }}"
