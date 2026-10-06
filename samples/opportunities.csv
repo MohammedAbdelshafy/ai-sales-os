@@ -1,0 +1,8 @@
+id,company,contact,stage,value,last_touch_date,owner,source,suppressed
+opp-001,Acme Dental Studio,sara@acmedental.example,new,750,2026-10-01,marwa,referral,
+opp-002,Bright Smile Clinic,info@brightsmile.example,contacted,1200,2026-09-10,marwa,cold_email,
+opp-003,Northside Orthodontics,,qualified,2500,2026-09-28,tarek,webinar,
+opp-004,Harbor Legal Group,partner@harborlegal.example,negotiating,3000,2026-08-01,marwa,referral,
+opp-005,Maple Realty,agent@maplerealty.example,contacted,499,2026-10-04,tarek,ads,true
+opp-006,Pearl Physio,jane@pearlphysio.example,new,400,2026-09-30,,webinar,
+opp-007,Cedar Roofing,ops@cedarroofing.example,closed_won,900,2026-09-15,marwa,referral,

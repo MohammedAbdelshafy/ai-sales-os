@@ -1,0 +1,15 @@
+# Sample ICP config for ai-sales-os (demo purposes only).
+# Tune these to your own ideal customer profile.
+min_value: 500
+max_value: 5000
+allowed_stages:
+  - new
+  - contacted
+  - qualified
+  - negotiating
+required_fields:
+  - contact
+  - owner
+excluded_domains:
+  - spamdomain.example
+stale_after_days: 21
