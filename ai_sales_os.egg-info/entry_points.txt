@@ -1,0 +1,2 @@
+[console_scripts]
+ai-sales-os = ai_sales_os.cli:main
