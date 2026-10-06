@@ -12,7 +12,7 @@ outreach; follow-up assets are prepared for human review.
 
 ## Install
 
-Requires Python 3.10+ (stdlib only, no dependencies).
+Requires Python 3.9+ (stdlib only, no dependencies).
 
 ```bash
 git clone https://github.com/MohammedAbdelshafy/ai-sales-os.git
@@ -30,6 +30,10 @@ python3 -m ai_sales_os qualify \
 ```
 
 Expected result with the sample data: `evaluated 7 rows, 1 qualified -> ./out`
+
+Exit codes: `0` = success; `2` = input or usage error (missing file, bad
+`--run-date`, unreadable config, unwritable output directory). Error details
+go to stderr; no traceback is printed for these expected failures.
 
 ## Inputs
 
@@ -50,8 +54,10 @@ Expected result with the sample data: `evaluated 7 rows, 1 qualified -> ./out`
 
 - `next_actions.csv` — `id, action, deadline, reason`. Deadlines derive from
   (stage, days-since-last-touch, `--run-date`) only.
-- `exceptions.md` — manager report: missing required data, stale deals, value
-  outside the ICP band, suppressed/excluded records.
+- `exceptions.md` — manager report: missing required data, stale or
+  future-dated deals, value outside the ICP band, suppressed/excluded
+  records. A `last_touch_date` in the future fails the freshness rule and is
+  listed here (it is not treated as stale).
 - `qualified.json` — full per-row evidence: each rule's pass/fail + evidence,
   score, and provenance (source file, row number, ICP file used).
 - `run_meta.json` — run id, run date, run timestamp, input file checksums.

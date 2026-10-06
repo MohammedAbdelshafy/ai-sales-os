@@ -89,6 +89,11 @@ class TestDeadlines(unittest.TestCase):
         rec = recommend(ev_for("mystery", 3), CFG, RUN)
         self.assertEqual(rec["deadline"], "2026-10-13")
 
+    def test_future_dated_touch_worded_without_negative_days(self):
+        rec = recommend(ev_for("new", -14), CFG, RUN)
+        self.assertNotIn("-14 days ago", rec["reason"])
+        self.assertIn("in 14 days (future-dated touch)", rec["reason"])
+
 
 if __name__ == "__main__":
     unittest.main()

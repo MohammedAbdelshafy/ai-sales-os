@@ -162,6 +162,18 @@ def evaluate_row(row: dict, cfg: dict, run_date: date) -> dict:
     }
 
 
+def rule(evidence: dict, name: str) -> dict:
+    """Fetch one rule result by name from an evaluated record.
+
+    Rules are looked up by name, never by list position, so reordering
+    rules in evaluate_row cannot silently corrupt consumers.
+    """
+    for r in evidence["rules"]:
+        if r["rule"] == name:
+            return r
+    raise KeyError(f"unknown rule: {name!r}")
+
+
 def read_opportunities(path: str | Path) -> tuple[list[dict], list[dict]]:
     """Read the opportunities CSV.
 

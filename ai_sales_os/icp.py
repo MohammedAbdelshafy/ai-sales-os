@@ -47,13 +47,15 @@ def validate(raw: dict) -> dict:
     cfg = dict(DEFAULTS)
     cfg.update(raw)
 
-    if not isinstance(cfg["min_value"], (int, float)):
+    if not isinstance(cfg["min_value"], (int, float)) or isinstance(cfg["min_value"], bool):
         raise ValueError("icp.min_value must be numeric")
-    if not isinstance(cfg["max_value"], (int, float)):
+    if not isinstance(cfg["max_value"], (int, float)) or isinstance(cfg["max_value"], bool):
         raise ValueError("icp.max_value must be numeric")
     if cfg["min_value"] > cfg["max_value"]:
         raise ValueError("icp.min_value must be <= icp.max_value")
-    if not isinstance(cfg["stale_after_days"], int) or cfg["stale_after_days"] < 0:
+    if (not isinstance(cfg["stale_after_days"], int)
+            or isinstance(cfg["stale_after_days"], bool)
+            or cfg["stale_after_days"] < 0):
         raise ValueError("icp.stale_after_days must be a non-negative integer")
 
     for key in ("allowed_stages", "required_fields", "excluded_domains",

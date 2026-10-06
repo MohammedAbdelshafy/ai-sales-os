@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+from .qualify import rule
+
 # Stage -> (default action, default deadline offset in days)
 STAGE_PLAYBOOK = {
     "new": ("Initial outreach", 1),
@@ -32,10 +34,11 @@ def recommend(evidence: dict, cfg: dict, run_date: date) -> dict:
                     None,
                     f"record suppressed ({evidence['suppression_evidence']}); "
                     "leave untouched")
-    if not evidence["rules"][0]["passed"]:
+    required = rule(evidence, "required_fields")
+    if not required["passed"]:
         deadline = run_date + timedelta(days=3)
         return _rec(opp_id, "Collect missing data", deadline,
-                    evidence["rules"][0]["evidence"])
+                    required["evidence"])
     if days is not None and days > stale_limit:
         deadline = run_date + timedelta(days=2)
         return _rec(opp_id, "Re-engage or close", deadline,
@@ -45,8 +48,13 @@ def recommend(evidence: dict, cfg: dict, run_date: date) -> dict:
     action, offset = STAGE_PLAYBOOK.get(
         stage, ("Review and assign next step", 7))
     deadline = run_date + timedelta(days=offset)
-    days_str = "unknown" if days is None else str(days)
-    reason = (f"stage={stage!r}; last touch {days_str} days ago; "
+    if days is None:
+        days_str = "unknown"
+    elif days < 0:
+        days_str = f"in {-days} days (future-dated touch)"
+    else:
+        days_str = f"{days} days ago"
+    reason = (f"stage={stage!r}; last touch {days_str}; "
               f"playbook action '{action}' due in {offset} days")
     return _rec(opp_id, action, deadline, reason)
 

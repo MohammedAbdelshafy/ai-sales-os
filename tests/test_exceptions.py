@@ -57,7 +57,7 @@ class TestExceptions(unittest.TestCase):
             self.assertNotIn("e-1", section.split("\n\n")[1])
 
     def test_stale_record_in_stale_section(self):
-        stale = self.text.split("## 2. Stale deals")[1].split("## 3.")[0]
+        stale = self.text.split("## 2. Stale / future-dated deals")[1].split("## 3.")[0]
         self.assertIn("e-2", stale)
         self.assertIn("66 days ago", stale)
 
@@ -76,7 +76,7 @@ class TestExceptions(unittest.TestCase):
         self.assertIn("e-5", supp)
 
     def test_suppressed_not_double_counted_as_stale(self):
-        stale = self.text.split("## 2. Stale deals")[1].split("## 3.")[0]
+        stale = self.text.split("## 2. Stale / future-dated deals")[1].split("## 3.")[0]
         self.assertNotIn("e-5", stale)
 
     def test_sections_appear_in_fixed_order(self):
@@ -86,6 +86,20 @@ class TestExceptions(unittest.TestCase):
     def test_source_row_numbers_present(self):
         self.assertIn("source row 2", self.text)
         self.assertIn("source row 5", self.text)
+
+    def test_future_dated_touch_listed_in_stale_section(self):
+        future_row = {"id": "e-6", "company": "Time Travel Co", "contact": "f@x.com",
+                      "stage": "new", "value": "900",
+                      "last_touch_date": "2026-10-20", "owner": "sam"}
+        evaluated = self.evaluated + [ev(future_row, 6)]
+        path = Path(self.tmp.name) / "exceptions_future.md"
+        write_exceptions(path, evaluated, CFG)
+        text = path.read_text(encoding="utf-8")
+        stale = text.split("## 2. Stale / future-dated deals")[1].split("## 3.")[0]
+        self.assertIn("e-6", stale)
+        self.assertIn("in the future", stale)
+        # and it must not be reported as a normal stale deal
+        self.assertNotIn("days ago", stale.split("e-6")[1].split("\n")[0])
 
 
 if __name__ == "__main__":

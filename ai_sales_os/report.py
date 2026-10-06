@@ -12,6 +12,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .qualify import rule
+
 
 def write_next_actions(path: Path, records: list[dict]) -> None:
     with path.open("w", newline="", encoding="utf-8") as fh:
@@ -36,20 +38,24 @@ def write_exceptions(path: Path, evaluated: list[dict], cfg: dict) -> None:
                 f"- {label}: {ev['suppression_evidence']} — {row_ref}")
             continue
 
-        if not ev["rules"][0]["passed"]:
+        required = rule(ev, "required_fields")
+        if not required["passed"]:
             missing.append(
-                f"- {label}: {ev['rules'][0]['evidence']} — {row_ref}")
+                f"- {label}: {required['evidence']} — {row_ref}")
 
         days = ev["days_since_last_touch"]
         if days is not None and days > cfg["stale_after_days"]:
             stale.append(
                 f"- {label}: last touch {days} days ago "
                 f"(threshold {cfg['stale_after_days']}) — {row_ref}")
+        elif days is not None and days < 0:
+            stale.append(
+                f"- {label}: {rule(ev, 'freshness')['evidence']} — {row_ref}")
         elif days is None:
             stale.append(
-                f"- {label}: {ev['rules'][4]['evidence']} — {row_ref}")
+                f"- {label}: {rule(ev, 'freshness')['evidence']} — {row_ref}")
 
-        val_rule = ev["rules"][1]
+        val_rule = rule(ev, "value_band")
         if not val_rule["passed"] and ev["value_parsed"] is not None:
             out_of_band.append(
                 f"- {label}: {val_rule['evidence']} — {row_ref}")
@@ -57,12 +63,12 @@ def write_exceptions(path: Path, evaluated: list[dict], cfg: dict) -> None:
             missing.append(
                 f"- {label}: {val_rule['evidence']} — {row_ref}")
 
-        dom_rule = ev["rules"][3]
+        dom_rule = rule(ev, "domain_allowed")
         if not dom_rule["passed"]:
             suppressed.append(
                 f"- {label}: {dom_rule['evidence']} — {row_ref}")
 
-        stage_rule = ev["rules"][2]
+        stage_rule = rule(ev, "stage_allowed")
         if not stage_rule["passed"]:
             suppressed.append(
                 f"- {label}: {stage_rule['evidence']} — {row_ref}")
@@ -76,7 +82,7 @@ def write_exceptions(path: Path, evaluated: list[dict], cfg: dict) -> None:
         "",
     ]
     lines += missing or ["_None._"]
-    lines += ["", "## 2. Stale deals", ""]
+    lines += ["", "## 2. Stale / future-dated deals", ""]
     lines += stale or ["_None._"]
     lines += ["", "## 3. Value outside ICP band", ""]
     lines += out_of_band or ["_None._"]

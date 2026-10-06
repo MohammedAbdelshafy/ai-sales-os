@@ -25,7 +25,19 @@ def parse_args(argv=None):
     p.add_argument("--version", action="version", version=f"ai-sales-os {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
-    q = sub.add_parser("qualify", help="Qualify opportunities against an ICP config")
+    q = sub.add_parser(
+        "qualify",
+        help="Qualify opportunities against an ICP config",
+        description="Qualify opportunities against an ICP config and write "
+                    "next_actions.csv, exceptions.md, qualified.json and "
+                    "run_meta.json to the output directory.",
+        epilog="Example:\n"
+               "  ai-sales-os qualify --opps samples/opportunities.csv \\\n"
+               "      --icp samples/icp.yaml --out ./out --run-date 2026-10-06\n"
+               "\n"
+               "Exit codes: 0 = success, 2 = input/usage error.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     q.add_argument("--opps", required=True, help="opportunities CSV file")
     q.add_argument("--icp", required=True, help="ICP config file (YAML or JSON)")
     q.add_argument("--out", required=True, help="output directory")
@@ -40,8 +52,9 @@ def cmd_qualify(args) -> int:
     opps_path = Path(args.opps)
     icp_path = Path(args.icp)
     out_dir = Path(args.out)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Validate the run date before touching the filesystem: a bad --run-date
+    # must not leave an empty output directory behind.
     if args.run_date:
         try:
             run_date = datetime.strptime(args.run_date, "%Y-%m-%d").date()
@@ -52,6 +65,13 @@ def cmd_qualify(args) -> int:
     else:
         run_date = date.today()
     run_id = args.run_id or str(uuid.uuid4())
+
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        print(f"error: cannot create output directory {out_dir}: {exc}",
+              file=sys.stderr)
+        return 2
 
     try:
         cfg = load_config(icp_path)
@@ -76,20 +96,25 @@ def cmd_qualify(args) -> int:
         "source_file": opps_path.name,
         "icp_file": icp_path.name,
     }
-    write_next_actions(out_dir / "next_actions.csv", actions)
-    write_exceptions(out_dir / "exceptions.md", evaluated, cfg)
-    write_qualified(out_dir / "qualified.json", evaluated, provenance)
-    write_run_meta(
-        out_dir / "run_meta.json",
-        run_id=run_id,
-        run_date=run_date.isoformat(),
-        opps_file=opps_path.name,
-        icp_file=icp_path.name,
-        opps_sha256=sha256_file(opps_path),
-        icp_sha256=sha256_file(icp_path),
-        row_count=len(evaluated),
-        qualified_count=sum(1 for ev in evaluated if ev["qualified"]),
-    )
+    try:
+        write_next_actions(out_dir / "next_actions.csv", actions)
+        write_exceptions(out_dir / "exceptions.md", evaluated, cfg)
+        write_qualified(out_dir / "qualified.json", evaluated, provenance)
+        write_run_meta(
+            out_dir / "run_meta.json",
+            run_id=run_id,
+            run_date=run_date.isoformat(),
+            opps_file=opps_path.name,
+            icp_file=icp_path.name,
+            opps_sha256=sha256_file(opps_path),
+            icp_sha256=sha256_file(icp_path),
+            row_count=len(evaluated),
+            qualified_count=sum(1 for ev in evaluated if ev["qualified"]),
+        )
+    except OSError as exc:
+        print(f"error: cannot write outputs to {out_dir}: {exc}",
+              file=sys.stderr)
+        return 2
 
     qualified = sum(1 for ev in evaluated if ev["qualified"])
     print(f"evaluated {len(evaluated)} rows, {qualified} qualified -> {out_dir}")

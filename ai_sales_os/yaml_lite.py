@@ -36,7 +36,12 @@ def _parse_scalar(text: str):
 def load(text: str) -> dict:
     """Parse a small YAML-subset document into a dict."""
     lines = []
-    for raw in text.splitlines():
+    for lineno, raw in enumerate(text.splitlines(), start=1):
+        if "\t" in raw:
+            raise ValueError(
+                f"Tabs are not supported for indentation (line {lineno}); "
+                "use spaces"
+            )
         # strip comments (a "#" not inside quotes starts a comment)
         stripped = _strip_comment(raw)
         if stripped.strip() == "":
@@ -122,7 +127,7 @@ def _parse_list(lines, pos, indent):
             raise ValueError(f"Unexpected indent at line: {cur_text!r}")
         item_text = cur_text[1:].strip()
         pos += 1
-        if ":" in item_text and not _looks_scalar(item_text):
+        if _is_inline_mapping(item_text) and not _looks_scalar(item_text):
             # inline mapping "- key: value" (single pair; nested handled simply)
             key, _, rest = item_text.partition(":")
             sub = {key.strip(): _parse_scalar(rest)}
@@ -142,6 +147,14 @@ def _parse_list(lines, pos, indent):
         else:
             items.append(_parse_scalar(item_text))
     return items, pos
+
+
+def _is_inline_mapping(text: str) -> bool:
+    # "- key: value" / "- key:" is an inline mapping, but a bare colon inside
+    # a scalar ("- http://x:8080/y", "- 12:30") is not — YAML only treats a
+    # colon as a mapping separator when followed by space or end of line.
+    t = text.strip()
+    return t.endswith(":") or ": " in t
 
 
 def _looks_scalar(text: str) -> bool:
