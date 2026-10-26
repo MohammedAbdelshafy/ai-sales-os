@@ -1,6 +1,7 @@
 # Sales Follow-Up Workspace
 
-A command-line tool that checks an approved opportunities file against your stated sales criteria, prepares a queue of next actions, and highlights records that need a manager's attention. It keeps the evidence and reason for each result.
+A small command-line tool that takes an approved opportunities CSV and creates a reviewable qualification queue, next-action list and exception report. It shows the evidence behind each rule and keeps follow-up drafts for a person to review.
+It organizes records you supply; it does not send outreach automatically or prove that an opportunity will convert.
 
 Customer-facing name: **Sales Follow-Up Workspace**. The repository, package and command identifiers remain unchanged.
 
