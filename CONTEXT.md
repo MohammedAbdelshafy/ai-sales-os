@@ -8,24 +8,24 @@ source_of_truth: https://github.com/MohammedAbdelshafy/ai-sales-os
 
 # Sales Follow-Up Workspace CONTEXT
 
-One job: help a sales team see which supplied opportunities deserve attention and what the next action should be.
+One job: turn approved opportunity records into a ranked work queue and make the next action clear.
 
 ## Inputs
-- Commands and limitations: [README](README.md)
+- Usage and criteria: [README](README.md)
 - Implementation: [ai_sales_os](ai_sales_os/)
 - Tests: [tests](tests/)
-- Samples: [samples](samples/)
+- Example inputs: [samples](samples/)
 
 ## Process
-1. Read the approved opportunity records and declared qualification criteria.
-2. Preserve source details, owner, stage, timestamps and suppression state.
-3. Apply only the stated rules and the available evidence.
-4. Produce next actions with clear reasons/deadlines.
-5. Flag missing, stale, excluded or ambiguous rows for human review.
-6. Prepare follow-up material; do not send it automatically.
+1. Read the supplied opportunities file and declared qualification rules.
+2. Keep source, row, owner, stage, timestamps and suppression state visible.
+3. Qualify only against provided criteria and available evidence.
+4. Produce next actions and deadlines from the documented rules.
+5. Flag missing, stale, suppressed or ambiguous records for review.
+6. Prepare follow-up assets but never send them.
 
 ## Output
-A qualification queue, next-action list and exception report.
+A qualification queue, next-action list and manager exceptions report.
 
 ## Check
-Run the repository tests and verify that suppressed/excluded records stay out of work queues, reasons remain traceable, and no external communication is sent.
+Run the test suite. Verify that future-dated records, suppression, missing fields and unclear cases are handled as documented. Do not equate a score with a guaranteed sale.
