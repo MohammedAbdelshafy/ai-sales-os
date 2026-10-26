@@ -1,14 +1,9 @@
-# ai-sales-os
+# Sales Follow-Up Workspace
 
-A command-line tool that turns an approved opportunities CSV into an
-evidence-backed qualification queue: per-row ICP pass/fail evidence, a
-next-action list with deterministic deadlines, and a manager exception report.
+A small command-line tool that takes an approved opportunities CSV and creates a reviewable qualification queue, next-action list and exception report. It shows the evidence behind each rule and keeps follow-up drafts for a person to review.
+It organizes records you supply; it does not send outreach automatically or prove that an opportunity will convert.
 
-It implements the AI Sales OS workflow: ingest approved records, preserve
-provenance (source file, row number), owner, stage, timestamps and suppression
-state, qualify only against a declared ICP and available evidence, recommend
-next actions with deadlines, and escalate ambiguous cases. It never auto-sends
-outreach; follow-up assets are prepared for human review.
+Customer-facing name: **Sales Follow-Up Workspace**. The repository, package and command identifiers remain unchanged.
 
 ## Install
 
