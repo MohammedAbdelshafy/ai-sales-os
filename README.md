@@ -1,4 +1,4 @@
-# Sales Follow-Up Workspace
+# SalesOS
 
 A small command-line tool that takes an approved opportunities CSV and creates a reviewable qualification queue, next-action list and exception report. It shows the evidence behind each rule and keeps follow-up drafts for a person to review.
 It organizes records you supply; it does not send outreach automatically or prove that an opportunity will convert.
