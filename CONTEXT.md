@@ -2,11 +2,11 @@
 type: repository
 status: active
 owner_repo: MohammedAbdelshafy/ai-sales-os
-product_name: Sales Follow-Up Workspace
+product_name: SalesOS
 source_of_truth: https://github.com/MohammedAbdelshafy/ai-sales-os
 ---
 
-# Sales Follow-Up Workspace CONTEXT
+# SalesOS CONTEXT
 
 One job: help a person decide which opportunity needs attention next and why.
 
