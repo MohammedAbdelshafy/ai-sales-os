@@ -1,6 +1,7 @@
-# Sales Follow-Up Workspace
+# Sales Follow-Up Workspace (AI Sales OS)
 
-A command-line tool that reads an approved opportunities file and produces a ranked review queue, clear reasons for each qualification decision, next actions and a report of records needing attention. It keeps source details and suppression state, and prepares follow-up materials for human review rather than sending messages.
+A command-line tool that turns an approved opportunities CSV into a clear qualification queue, a list of next actions and a report of records that need a person's attention.
+It uses the fields and rules you supply. It does not find new buyers, verify all facts independently, or send outreach; follow-up material is prepared for human review.
 
 Customer-facing name: **Sales Follow-Up Workspace**. The repository, package and command identifiers remain unchanged.
 
